@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<meta charset="utf-8">
+<title>Camper Navigation</title>
+<head>
+    
+    <h1><a href="Camper_Navigation.html">Camper Navigation</a></h1>
+    <h5>Developed by chuuu</h5>
+</head>
+
+<body onload="init(new google.maps.LatLng(36, 127.5), 7, google.maps.MapTypeId.ROADMAP)">
+    <div style="width:90%; height:100%">
+        <div style="">
+            <div id="map_canvas" style="float:left;width:85%; height:100%">
+            <form name="text">
+                텍스트 입력 and 이미지 삽입
+                <a href="https://www.w3.org/TR/html5/" target="_blank" title="html5 specification">Hypertext Markup Language (HTML)</a>
+                <br>
+                <img src="dev_c++_what_is_stl 복사본.png" width="60%">
+                </form>
+            </div>
+            <div style="float:left;width:10%; height:50%">
+                <form name="SearchList">
+                    <ol>
+                        <li>서울</li>
+                        <li>부산</li>
+                        <li>인천</li>
+                        <li>울산</li>
+                        <li>대전</li>
+                        <li>대구</li>
+                        <li>광주</li>
+                    </ol>
+                </form>
+                <form name="point">
+                    좌표리스트<input type="button" value="Display" onclick="drawPoint()"><br> Lon,Lat,[Icon]
+                    <br>
+                    <textarea name="list" rows="30" cols="35"></textarea>
+                    <br>
+                    <input type="button" value="Clear" onclick="clearRoutes()">
+                </form>
+            </div>
+        </div>
+        <div id="debug" />
+    </div>
+</body>
+</html>
