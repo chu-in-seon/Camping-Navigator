@@ -1,46 +1,82 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<meta charset="utf-8">
-<title>Camper Navigation</title>
 <head>
+	<meta charset="utf-8"/>
+	<title>Camper Navigation for Kakao</title>
     
-    <h1><a href="Camper_Navigation.html">Camper Navigation</a></h1>
-    <h5>Developed by chuuu</h5>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=API_KEY"></script>
+    <!-- services 라이브러리 불러오기 -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=API_KEY&libraries=services"></script>
+    <!-- services와 clusterer, drawing 라이브러리 불러오기 -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=API_KEY&libraries=services,clusterer,drawing"></script>
+     <style>
+         html, body {width:100%;height:100%;margin:0;padding:0;} 
+        .map_wrap {position:relative;overflow:hidden;width:1100px;height:700px;}
+        .radius_border{border:1px solid #919191;border-radius:5px;}
+        .custom_typecontrol {position:absolute;top:10px;right:10px;overflow:hidden;width:130px;height:30px;margin:0;padding:0;z-index:1;font-size:12px;font-family:'Malgun Gothic', '맑은 고딕', sans-serif;}
+        .custom_typecontrol span {display:block;width:65px;height:30px;float:left;text-align:center;line-height:30px;cursor:pointer;}
+        .custom_typecontrol .btn {background:#fff;background:linear-gradient(#fff,  #e6e6e6);}
+        .custom_typecontrol .btn:hover {background:#f5f5f5;background:linear-gradient(#f5f5f5,#e3e3e3);}
+        .custom_typecontrol .btn:active {background:#e6e6e6;background:linear-gradient(#e6e6e6, #fff);}
+        .custom_typecontrol .selected_btn {color:#fff;background:#425470;background:linear-gradient(#425470, #5b6d8a);}
+        .custom_typecontrol .selected_btn:hover {color:#fff;}
+        .custom_zoomcontrol {position:absolute;top:50px;right:10px;width:36px;height:80px;overflow:hidden;z-index:1;background-color:#f5f5f5;} 
+        .custom_zoomcontrol span {display:block;width:36px;height:40px;text-align:center;cursor:pointer;}
+        .custom_zoomcontrol span img {width:15px;height:15px;padding:12px 0;border:none;}
+        .custom_zoomcontrol span:first-child{border-bottom:1px solid #bfbfbf;}
+    </style>
 </head>
-
-<body onload="init(new google.maps.LatLng(36, 127.5), 7, google.maps.MapTypeId.ROADMAP)">
-    <div style="width:90%; height:100%">
-        <div style="">
-            <div id="map_canvas" style="float:left;width:85%; height:100%">
-            <form name="text">
-                텍스트 입력 and 이미지 삽입
-                <a href="https://www.w3.org/TR/html5/" target="_blank" title="html5 specification">Hypertext Markup Language (HTML)</a>
-                <br>
-                <img src="dev_c++_what_is_stl 복사본.png" width="60%">
-                </form>
-            </div>
-            <div style="float:left;width:10%; height:50%">
-                <form name="SearchList">
-                    <ol>
-                        <li>서울</li>
-                        <li>부산</li>
-                        <li>인천</li>
-                        <li>울산</li>
-                        <li>대전</li>
-                        <li>대구</li>
-                        <li>광주</li>
-                    </ol>
-                </form>
-                <form name="point">
-                    좌표리스트<input type="button" value="Display" onclick="drawPoint()"><br> Lon,Lat,[Icon]
-                    <br>
-                    <textarea name="list" rows="30" cols="35"></textarea>
-                    <br>
-                    <input type="button" value="Clear" onclick="clearRoutes()">
-                </form>
-            </div>
+    
+    
+<body>
+    <h1>Camper Navigator</h1>
+    <h5>Developed by Inseon, Chu</h5>
+    <div class="map_wrap">
+        <div id="map" style="width:1100px;height:700px;position:relative;overflow:hidden;"></div> 
+        <!-- 지도타입 컨트롤 div 입니다 -->
+        <div class="custom_typecontrol radius_border">
+            <span id="btnRoadmap" class="selected_btn" onclick="setMapType('roadmap')">지도</span>
+            <span id="btnSkyview" class="btn" onclick="setMapType('skyview')">스카이뷰</span>
         </div>
-        <div id="debug" />
+        <!-- 지도 확대, 축소 컨트롤 div 입니다 -->
+        <div class="custom_zoomcontrol radius_border"> 
+            <span onclick="zoomIn()"><img src="https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/ico_plus.png" alt="확대"></span>  
+            <span onclick="zoomOut()"><img src="https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/ico_minus.png" alt="축소"></span>
+        </div>
     </div>
+	<script>
+		var container = document.getElementById('map');
+		var options = {
+			center: new kakao.maps.LatLng(35.757382, 127.949846),
+			level: 13
+		};
+
+		var map = new kakao.maps.Map(container, options);
+        
+        // 지도타입 컨트롤의 지도 또는 스카이뷰 버튼을 클릭하면 호출되어 지도타입을 바꾸는 함수입니다
+        function setMapType(maptype) { 
+            var roadmapControl = document.getElementById('btnRoadmap');
+            var skyviewControl = document.getElementById('btnSkyview'); 
+            if (maptype === 'roadmap') {
+                map.setMapTypeId(kakao.maps.MapTypeId.ROADMAP);    
+                roadmapControl.className = 'selected_btn';
+                skyviewControl.className = 'btn';
+            } else {
+                map.setMapTypeId(kakao.maps.MapTypeId.HYBRID);    
+                skyviewControl.className = 'selected_btn';
+                roadmapControl.className = 'btn';
+            }
+        }
+
+        // 지도 확대, 축소 컨트롤에서 확대 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
+        function zoomIn() {
+            map.setLevel(map.getLevel() - 1);
+        }
+
+        // 지도 확대, 축소 컨트롤에서 축소 버튼을 누르면 호출되어 지도를 확대하는 함수입니다
+        function zoomOut() {
+            map.setLevel(map.getLevel() + 1);
+        }
+	</script>
 </body>
 </html>
