@@ -4,26 +4,48 @@
 	<meta charset="utf-8"/>
 	<title>Camper Navigation for Kakao</title>
     
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=API_KEY"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=f468f3ef0f758b1659fedab56a1b0623"></script>
     <!-- services 라이브러리 불러오기 -->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=API_KEY&libraries=services"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=f468f3ef0f758b1659fedab56a1b0623&libraries=services"></script>
     <!-- services와 clusterer, drawing 라이브러리 불러오기 -->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=API_KEY&libraries=services,clusterer,drawing"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=f468f3ef0f758b1659fedab56a1b0623&libraries=services,clusterer,drawing"></script>
      <style>
-         html, body {width:100%;height:100%;margin:0;padding:0;} 
-        .map_wrap {position:relative;overflow:hidden;width:1100px;height:700px;}
+         html, body {width:100%;height:100%;padding:0;} 
+         
+        .map_wrap {position:relative;width:75%;height:100%;overflow:hidden;float:left;}
+         
+        .map_view {position:relative;width:100%;height:100%;overflow:hidden;float:left;}
+         
         .radius_border{border:1px solid #919191;border-radius:5px;}
-        .custom_typecontrol {position:absolute;top:10px;right:10px;overflow:hidden;width:130px;height:30px;margin:0;padding:0;z-index:1;font-size:12px;font-family:'Malgun Gothic', '맑은 고딕', sans-serif;}
+         
+        .custom_typecontrol {position:absolute;top:10px;right:10px;width:130px;height:30px;margin:0;padding:0;z-index:1;font-size:12px;font-family:'Malgun Gothic', '맑은 고딕', sans-serif;}
         .custom_typecontrol span {display:block;width:65px;height:30px;float:left;text-align:center;line-height:30px;cursor:pointer;}
         .custom_typecontrol .btn {background:#fff;background:linear-gradient(#fff,  #e6e6e6);}
         .custom_typecontrol .btn:hover {background:#f5f5f5;background:linear-gradient(#f5f5f5,#e3e3e3);}
         .custom_typecontrol .btn:active {background:#e6e6e6;background:linear-gradient(#e6e6e6, #fff);}
         .custom_typecontrol .selected_btn {color:#fff;background:#425470;background:linear-gradient(#425470, #5b6d8a);}
         .custom_typecontrol .selected_btn:hover {color:#fff;}
-        .custom_zoomcontrol {position:absolute;top:50px;right:10px;width:36px;height:80px;overflow:hidden;z-index:1;background-color:#f5f5f5;} 
+         
+        .custom_zoomcontrol {position:absolute;top:50px;right:10px;width:36px;height:80px;z-index:1;background-color:#f5f5f5;} 
         .custom_zoomcontrol span {display:block;width:36px;height:40px;text-align:center;cursor:pointer;}
-        .custom_zoomcontrol span img {width:15px;height:15px;padding:12px 0;border:none;}
+        .custom_zoomcontrol span img {width:15px;height:15px;padding:12px;border:none;}
         .custom_zoomcontrol span:first-child{border-bottom:1px solid #bfbfbf;}
+         
+        .search_container {position:relative;width:25%;height:100%;overflow:hidden;float:right;background-color:aqua;}
+         
+        .search_input_panel {position:absolute; width:100%;height: 5%;background-color:antiquewhite;top:0px;}
+         
+        .search_textbox {position:absolute; width:75%; height:95%; background-color:aliceblue; border: 1px solid #0054FF; border-radius:3px; font-size: 12pt; text-align: center; color: #63717f; left:0px;}
+         
+        .search_button {position: absolute; width:25%; height: 100%; background-color: brown;right:0px; text-align: center;}
+        .search_button span {display:block;width:100%;height:100%;float:left;text-align:center;line-height:45px;cursor:pointer;}
+        .search_button .btn {background:#fff;background:linear-gradient(#fff,  #e6e6e6);}
+        .search_button .btn:hover {background:#f5f5f5;background:linear-gradient(#f5f5f5,#e3e3e3);}
+        .search_button .btn:active {background:#e6e6e6;background:linear-gradient(#e6e6e6, #fff);}
+        .search_button .search_btn {color:#fff;background:#425470;background:linear-gradient(#425470, #5b6d8a);}
+        .search_button .search_btn:hover {color:#fff;}
+         
+        .search_result {position:absolute; width:100%;height:95%;bottom:0px;}
     </style>
 </head>
     
@@ -31,8 +53,12 @@
 <body>
     <h1>Camper Navigator</h1>
     <h5>Developed by Inseon, Chu</h5>
+
+    <!-- 지도 표시를 위한 div-->
     <div class="map_wrap">
-        <div id="map" style="width:1100px;height:700px;position:relative;overflow:hidden;"></div> 
+        <!-- 실제 지도가 표시되는 div-->
+        <div id="map_view" class="map_view"> </div>
+        
         <!-- 지도타입 컨트롤 div 입니다 -->
         <div class="custom_typecontrol radius_border">
             <span id="btnRoadmap" class="selected_btn" onclick="setMapType('roadmap')">지도</span>
@@ -44,8 +70,28 @@
             <span onclick="zoomOut()"><img src="https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/ico_minus.png" alt="축소"></span>
         </div>
     </div>
+
+    <!-- 검색 및 검색 결과 표시 div-->
+    <div class="search_container">
+        <div class="search_input_panel">
+            <div class="search_textbox"></div>
+            <div class="search_input_panel search_button">
+                <span id="btnRoadmap" class="search_btn" onclick="">검색</span>
+            </div>
+        </div>
+        
+        
+        <div class=search_result>
+            Search 결과 표시 
+        <!-- search 결과에 따른 동적 테이블 표시 (캠핑장 정보 표시) --> 
+        </div>
+    </div>
+   
 	<script>
-		var container = document.getElementById('map');
+        // Kakao map 초기 설정을 위한 속성 변수 설정.
+        // 'map_view' 라는 id의 div element를 지도를 표시할 container로 설정한다.
+        // 지도의 초기 위치는 35.757382, 127.949846 이고, map scale level은 13으로 설정한다.
+		var container = document.getElementById('map_view');
 		var options = {
 			center: new kakao.maps.LatLng(35.757382, 127.949846),
 			level: 13
